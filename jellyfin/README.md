@@ -23,24 +23,6 @@ With the option `--env-file` you have to give the path to your `.env` file conta
 
 ### Portainer Stack
 
-Simply create a new Stack then copy and paste the following in the editor.
-
-```yaml
-version: "2.1"
-# More info at https://jellyfin.org/docs/general/administration/installing.html#docker
-# and https://jellyfin.org/docs/index.html
-services:
-  jellyfin:
-    container_name: jellyfin
-    image: jellyfin/jellyfin:latest
-    restart: unless-stopped
-    network_mode: host
-    volumes:
-      - ${CONFIG_DIR}/jellyfin/config:/config
-      - ${CONFIG_DIR}/jellyfin/cache:/cache
-      - ${MEDIA_DIR}/movies:/movies
-      - ${MEDIA_DIR}/shows:/shows
-      - ${MEDIA_DIR}/music:/music
-```
+Simply create a new Stack then copy and paste the contents of the `jellyfin-compose.yml` file in the editor.
 
 Before deploying **make sure to set the required environment variables**.

@@ -22,28 +22,6 @@ With the option `--env-file` you have to give the path to your `.env` file conta
 
 ### Portainer Stack
 
-Simply create a new Stack then copy and paste the following in the editor.
-
-```yaml
-version: "2.1"
-# More info at https://gitlab.com/Bockiii/deemix-docker
-services:
-  deemix:
-    image: registry.gitlab.com/bockiii/deemix-docker
-    container_name: deemix
-    restart: unless-stopped
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      # If you want Deemix to automatically log in for everyone who opens the site,
-      # provide your ARL token via this Environment variable.
-      # - ARL=1234567
-      - UMASK_SET=022
-    volumes:
-      - ${CONFIG_DIR}/deemix:/config
-      - ${MEDIA_DIR}/music:/downloads
-    ports:
-      - 6595:6595
-```
+Simply create a new Stack then copy and paste the contents of the `deemix-compose.yml` file in the editor.
 
 Before deploying **make sure to set the required environment variables**.
