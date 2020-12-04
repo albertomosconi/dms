@@ -1,0 +1,92 @@
+version: "2.1"
+
+services:
+  deluge:
+    # Torrent Client, more info at https://github.com/linuxserver/docker-deluge
+    container_name: deluge
+    image: linuxserver/deluge:latest
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIR}/downloads:/downloads
+      - ${CONFIG_DIR}/deluge:/config
+
+  jackett:
+    # Torrent tracker manager for Sonarr, Radarr
+    # more info at https://github.com/linuxserver/docker-jackett
+    container_name: jackett
+    image: linuxserver/jackett:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_DIR}/downloads/torrent-blackhole:/downloads
+      - ${CONFIG_DIR}/jackett:/config
+
+  sonarr:
+    # Monitor tv shows, automatically download, sort and rename episode files
+    # more info at https://github.com/linuxserver/docker-sonarr
+    container_name: sonarr
+    image: linuxserver/sonarr:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/config/sonarr:/config
+      - ${MEDIA_DIR}/shows:/tv
+      - ${MEDIA_DIR}/downloads:/downloads
+    depends_on:
+      - deluge
+      - jackett
+
+  radarr:
+    # Movie collection manager, automatically download movies, re-download if better quality is found
+    # more info at https://github.com/linuxserver/docker-radarr
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/radarr:/config
+      - ${MEDIA_DIR}/movies:/movies
+      - ${MEDIA_DIR}/downloads:/downloads
+    depends_on:
+      - deluge
+      - jackett
+
+  bazarr:
+    # Manage and download subtitles for Sonarr and Radarr
+    # more info at https://github.com/linuxserver/docker-bazarr
+    container_name: bazarr
+    image: linuxserver/bazarr:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_DIR}/bazarr:/config
+      - ${MEDIA_DIR}/movies:/movies
+      - ${MEDIA_DIR}/shows:/tv
+    ports:
+      - 6767:6767
+    depends_on:
+      - deluge
+      - jackett
+      - sonarr
+      - radarr
