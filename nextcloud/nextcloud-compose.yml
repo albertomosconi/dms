@@ -1,0 +1,31 @@
+version: "2.1"
+
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${PASSWD}
+      - MYSQL_PASSWORD=${PASSWD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    volumes:
+      - ${CONFIG_DIR}/mariadb:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  nextcloud:
+    image: linuxserver/nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - ${CONFIG_DIR}/nextcloud:/config
+      - ${MEDIA_DIR}/files:/data
+    ports:
+      - 8080:443
+    depends_on:
+      - mariadb
