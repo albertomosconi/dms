@@ -5,7 +5,7 @@ The following applications all work together to create a powerful movie and show
 - [Sonarr](https://sonarr.tv)
 - [Radarr](https://radarr.video)
 - [Bazarr](https://www.bazarr.media)
-- [Deluge](https://www.deluge-torrent.org)
+- [qBittorrent](https://www.qbittorrent.org/)
 - [Jackett](https://github.com/Jackett/Jackett)
 
 ## Deploy Container

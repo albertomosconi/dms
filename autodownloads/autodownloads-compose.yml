@@ -1,19 +1,34 @@
+#
+# ░█▀▄░▄▀▀▄░█▀▄░█░▄░█▀▀░█▀▀▄░░░█▀▄▀█░█▀▀░█▀▄░░▀░░█▀▀▄░░░█▀▀░█▀▀░█▀▀▄░▄░░░▄░█▀▀░█▀▀▄
+# ░█░█░█░░█░█░░░█▀▄░█▀▀░█▄▄▀░░░█░▀░█░█▀▀░█░█░░█▀░█▄▄█░░░▀▀▄░█▀▀░█▄▄▀░░█▄█░░█▀▀░█▄▄▀
+# ░▀▀░░░▀▀░░▀▀▀░▀░▀░▀▀▀░▀░▀▀░░░▀░░▒▀░▀▀▀░▀▀░░▀▀▀░▀░░▀░░░▀▀▀░▀▀▀░▀░▀▀░░░▀░░░▀▀▀░▀░▀▀
+#
+# Configuration files for a home server docker setup with Pihole, 
+# Nextcloud, Jellyfin, Sonarr, Radarr and Deemix.
+# https://github.com/albertomosconi/dms
+# 
+
 version: "2.1"
 
 services:
-  deluge:
-    # Torrent Client, more info at https://github.com/linuxserver/docker-deluge
-    container_name: deluge
-    image: linuxserver/deluge:latest
-    network_mode: host
+  qbittorrent:
+    # Torrent Client, more info at https://github.com/linuxserver/docker-qbittorrent
+    container_name: qbittorrent
+    image: ghcr.io/linuxserver/qbittorrent
     restart: unless-stopped
+    network_mode: host
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - WEBUI_PORT=7171
     volumes:
+      - ${CONFIG_DIR}/qbittorrent:/config
       - ${MEDIA_DIR}/downloads:/downloads
-      - ${CONFIG_DIR}/deluge:/config
+    ports:
+      - 6881:6881
+      - 6881:6881/udp
+      - 7171:7171
 
   jackett:
     # Torrent tracker manager for Sonarr, Radarr
@@ -46,7 +61,7 @@ services:
       - ${MEDIA_DIR}/shows:/tv
       - ${MEDIA_DIR}/downloads:/downloads
     depends_on:
-      - deluge
+      - qbittorrent
       - jackett
 
   radarr:
@@ -65,7 +80,7 @@ services:
       - ${MEDIA_DIR}/movies:/movies
       - ${MEDIA_DIR}/downloads:/downloads
     depends_on:
-      - deluge
+      - qbittorrent
       - jackett
 
   bazarr:
@@ -86,7 +101,7 @@ services:
     ports:
       - 6767:6767
     depends_on:
-      - deluge
+      - qbittorrent
       - jackett
       - sonarr
       - radarr
